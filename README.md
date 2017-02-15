@@ -1,2 +1,2 @@
-# graphics_line
-Implementation of Bresenham's Line Algorithm in Java
+# Graphics Framework
+Framework for a graphics engine in Java.
