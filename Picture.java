@@ -64,4 +64,5 @@ public class Picture {
 	c.save("out.ppm");
 	// ==================================== */
     }
+
 }
