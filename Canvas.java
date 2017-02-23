@@ -4,22 +4,25 @@ import java.util.*;
 // ===================================================
 // Canvas Class - Drawing and Saving
 // ===================================================
-class Canvas {
+public class Canvas {
     private Pixel[][] canvas; // Drawing Canvas
+    private EdgeMatrix edges; // Lines
     private int x, y; // Dimensions
-
+    
     // Constructors
     public Canvas() {
 	canvas = new Pixel[500][500];
 	x = 500;
 	y = 500;
 	fill(255, 255, 255);
+	edges = new EdgeMatrix();
     }
     public Canvas(int x, int y) {
 	canvas = new Pixel[y][x];
 	this.x = x;
 	this.y = y;
 	fill(255, 255, 255);
+	edges = new EdgeMatrix();
     }
     public Canvas(int x, int y, Pixel p) {
 	this(x, y);
@@ -162,6 +165,29 @@ class Canvas {
 		canvas[y][i] = p;
 	    }
 	    layer++; y--;
+	}
+	return true;
+    }
+
+    // EdgeMatrix Functions
+    public boolean edge(double x1, double y1, double x2, double y2) {
+	return edge(x1, y1, x2, y2, new Pixel(0,0,0));
+    }
+    public boolean edge(double x1, double y1, double x2, double y2, Pixel p) {
+	return edges.add_edge(x1, y1, x2, y2, p);
+    }
+
+    public boolean draw() {
+	Iterator<double[]> edgelist = edges.iterator();
+	Iterator<Pixel> colors = edges.colorIterator();
+	while (edgelist.hasNext()) {
+	    double[] p1 = edgelist.next();
+	    double[] p2 = edgelist.next();
+	    int x1 = (int)(p1[0]);
+	    int y1 = (int)(p1[1]);
+	    int x2 = (int)(p2[0]);
+	    int y2 = (int)(p2[1]);
+	    line(x1, y1, x2, y2, colors.next());
 	}
 	return true;
     }

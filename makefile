@@ -15,3 +15,5 @@ png: out.ppm
 	java Picture; \
 	convert out.ppm out.png
 
+clean_images:
+	rm *.jpg *.png

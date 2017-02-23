@@ -20,6 +20,9 @@ public class Pixel {
 	this.G = G;
 	this.B = B;
     }
+    public Pixel(int[] RGB) {
+	this(RGB[0], RGB[1], RGB[2]);
+    }
     public Pixel(Pixel p) {
 	int[] rgb = p.getRGB();
 	R = rgb[0];
@@ -38,6 +41,16 @@ public class Pixel {
     public int[] getRGB() {
 	return new int[]{R, G, B};
     }
+
+    // Methods
+    public int[] adjust(int dR, int dG, int dB) {
+	int[] old = getRGB();
+	R += dR; G += dG; B += dB;
+	return old;
+    }
+    
+
+    // ToString Utility
     public String toString() {
 	return "" + R + " " + G + " " + B + "\n";
     }
