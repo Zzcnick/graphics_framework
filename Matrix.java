@@ -37,12 +37,20 @@ public class Matrix {
     public Matrix(double[][] darr) {
 	matrix = new ArrayList<double[]>();
 	for (double[] d : darr)
-	    matrix.add(d);
+	    matrix.add(Arrays.copyOf(d, d.length));
 	rows = darr[0].length;
 	columns = darr.length;
     }
     
     // Accessors + Mutators
+    public double get(int r, int c) {
+	return matrix.get(c)[r];
+    }
+    public double set(int r, int c, double d) {
+	double ret = matrix.get(c)[r];
+	matrix.get(c)[r] = d;
+	return ret;
+    }
     public int getRows() {
 	return rows;
     }
@@ -56,18 +64,12 @@ public class Matrix {
 	return ret;
     }
     public double[] getColumn(int c) {
-	return matrix.get(c);
-    }
-    public double get(int r, int c) {
-	return matrix.get(c)[r];
-    }
-
-    public double set(int r, int c, double d) {
-	double ret = matrix.get(c)[r];
-	matrix.get(c)[r] = d;
+	double[] ret = new double[rows];
+	for (int i = 0; i < rows; i++)
+	    ret[i] = matrix.get(c)[i];
 	return ret;
     }
- 
+
     // Matrix Functions
     public boolean copy(Matrix m) {
 	rows = m.getRows();
@@ -154,44 +156,54 @@ public class Matrix {
 
     // ToString Utility
     public String toString() {
-	String retStr = "[";
-	for (double[] a : matrix)
-	    retStr += Arrays.toString(a) + ",\n ";
-	return retStr.substring(0, retStr.length() - 3) + "]";
+	String retStr = "|";
+	for (int i = 0; i < rows; i++) {
+	    double[] tmp = this.getRow(i);
+	    for (int j = 0; j < tmp.length; j++) {
+		retStr += " " + tmp[j] + "\t";
+	    }
+	    retStr += "|\n|";
+	}
+	return retStr.substring(0, retStr.length() - 3) + "|";
     }
 
     // Testing
     public static void main(String[] args) {
 	Matrix pm = new Matrix();
-	System.out.println(pm);
+	System.out.println("Creating new Matrix...\n" + pm + "\n");
 	
 	Matrix pm2 = new Matrix(new double[][]
 	    { {1, 2, 3, 4},
 	      {5, 6, 7, 8}, 
 	      {9, 10, 11, 12},
 	      {13, 14, 15, 16} } );
-	System.out.println(pm2);
+	System.out.println("Creating second Matrix...\n" + pm2 + "\n");
 
 	pm.add(pm2);
-	System.out.println(pm);
+	System.out.println("Adding Matrix 2 to Matrix 1...\n" + pm + "\n");
 
 	pm.multiply(pm2);
-	System.out.println(pm);
+	System.out.println("Taking the product of Matrix 1 and Matrix 2...\n" + pm + "\n");
 
 	Matrix i = Matrix.identity(4);
-	System.out.println(i);
+	System.out.println("Creating 4 by 4 identity Matrix...\n" + i + "\n");
 
 	pm.multiply(i);
-	System.out.println(pm);
+	System.out.println("Multiplying Matrix 1 by identity Matrix...\n" + pm + "\n");
 
 	Matrix pm3 = new Matrix(new double[][]
 	    { {1, 2, 3, 4}, {5, 6, 7, 8} } );
-	System.out.println(pm3);
+	System.out.println("Creating third Matrix, 4 by 2 this time...\n" + pm3 + "\n");
 
 	pm.copy(pm2);
-	System.out.println(pm);
+	System.out.println("Copying contents of Matrix 2 to Matrix 1...\n" + pm + "\n");
 
-	pm2.multiply(pm3);
-	System.out.println(pm2);
+	pm.multiply(pm3);
+	System.out.println("Multipling Matrix 1 by Matrix 3...\n" + pm + "\n");
+
+	pm.scale(2.5);
+	System.out.println("Scaling contents of Matrix 1 by 2.5...\n" + pm + "\n");
+
+	System.out.println("Ensuring Matrix 2 is preserved...\n" + pm2 + "\n");
     }
 }
