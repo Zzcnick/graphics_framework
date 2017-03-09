@@ -2,10 +2,10 @@ all: Picture.java
 	javac Picture.java && java Picture
 
 run: Picture.java
-	make && make png && echo "Saved as out.png"
+	make && make png && echo "Saved as out.png" && display out.png
 
 clean: 
-	rm *.class *.ppm *~
+	rm *.class *.ppm *~ *.jpg *.png
 
 jpg: out.ppm
 	java Picture; \
@@ -14,6 +14,3 @@ jpg: out.ppm
 png: out.ppm
 	java Picture; \
 	convert out.ppm out.png
-
-clean_images:
-	rm *.jpg *.png

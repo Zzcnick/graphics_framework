@@ -6,7 +6,9 @@ import java.util.*;
 // ===================================================
 public class Canvas {
     private Pixel[][] canvas; // Drawing Canvas
-    private EdgeMatrix edges; // Lines
+    private Pixel[][] save; // Save State
+    private Matrix edges; // Lines
+    private Matrix transform; // Transformation Matrix
     private int x, y; // Dimensions
     
     // Constructors
@@ -15,14 +17,16 @@ public class Canvas {
 	x = 500;
 	y = 500;
 	fill(255, 255, 255);
-	edges = new EdgeMatrix();
+	edges = new Matrix();
+	transform = Matrix.identity(4);
     }
     public Canvas(int x, int y) {
 	canvas = new Pixel[y][x];
 	this.x = x;
 	this.y = y;
 	fill(255, 255, 255);
-	edges = new EdgeMatrix();
+	edges = new Matrix();
+	transform = Matrix.identity(4);
     }
     public Canvas(int x, int y, Pixel p) {
 	this(x, y);
@@ -42,6 +46,62 @@ public class Canvas {
     }
     public int getY() {
 	return y;
+    }
+    public Matrix getEdges() {
+	return edges;
+    }
+    public Matrix getTransform() {
+	return transform;
+    }
+
+    // Transformations
+    public Matrix scale(double sx, double sy, double sz) {
+	Matrix left = Matrix.identity(4);
+	left.set(0,0,sx);
+	left.set(1,1,sy);
+	left.set(2,2,sz);
+	transform = left.multiply(transform);
+	return transform;
+    }
+    public Matrix scale(double s) {
+	return scale(s, s, s);
+    }
+    public Matrix translate(double dx, double dy, double dz) {
+	Matrix left = Matrix.identity(4);
+	left.set(0,3,dx);
+	left.set(1,3,dy);
+	left.set(2,3,dz);
+	transform = left.multiply(transform);
+	return transform;
+    }
+    public Matrix rotate(char axis, double theta) {
+	Matrix left = Matrix.identity(4);
+	double rad = Math.toRadians(theta);
+	if (axis == 'z') {
+	    left.set(0,0,Math.cos(rad));
+	    left.set(1,1,Math.cos(rad));
+	    left.set(0,1,-1 * Math.sin(rad));
+	    left.set(1,0, Math.sin(rad));
+	} 
+	else if (axis == 'y') {
+	    left.set(0,0,Math.cos(rad));
+	    left.set(2,2,Math.cos(rad));
+	    left.set(0,2,-1 * Math.sin(rad));
+	    left.set(2,0,Math.sin(rad));
+	}
+	else if (axis == 'x') {
+	    left.set(1,1,Math.cos(rad));
+	    left.set(2,2,Math.cos(rad));
+	    left.set(1,2,-1 * Math.sin(rad));
+	    left.set(2,1,Math.sin(rad));
+	}
+	transform = left.multiply(transform);
+	return transform;
+    }
+    public Matrix apply() {
+	edges.copy(transform.multiply(edges));
+	transform = Matrix.identity(4);
+	return edges;
     }
 
     // Canvas Methods
@@ -66,6 +126,27 @@ public class Canvas {
     }
     public boolean fill(int R, int G, int B) {
 	return fill(new Pixel(R, G, B));
+    }
+
+    public boolean savestate() {
+	int h = canvas.length;
+	int w = canvas[0].length;
+	save = new Pixel[h][w];
+	for (int i = 0; i < h; i++) {
+	    for (int j = 0; j < w; j++) {
+		save[i][j] = canvas[i][j].copy();
+	    }
+	}
+	return true;
+    }
+    public boolean load() {
+	if (save != null) {
+	    for (int i = 0; i < y; i++) 
+		for (int j = 0; j < x; j++) 
+		    canvas[i][j] = save[i][j].copy();
+	    return true;
+	}
+	return false;
     }
 
     // Bresenham's Line Algorithm - 8 Octants
@@ -176,6 +257,14 @@ public class Canvas {
     public boolean edge(double x1, double y1, double x2, double y2, Pixel p) {
 	return edges.add_edge(x1, y1, x2, y2, p);
     }
+    public boolean edge(double x1, double y1, double z1,
+			double x2, double y2, double z2) {
+	return edges.add_edge(x1, y1, z1, x2, y2, z2, new Pixel(0,0,0));
+    }
+    public boolean edge(double x1, double y1, double z1,
+			double x2, double y2, double z2, Pixel p) {
+	return edges.add_edge(x1, y1, z1, x2, y2, z2, p);
+    }
 
     public boolean draw() {
 	Iterator<double[]> edgelist = edges.iterator();
@@ -189,6 +278,15 @@ public class Canvas {
 	    int y2 = (int)(p2[1]);
 	    line(x1, y1, x2, y2, colors.next());
 	}
+	return true;
+    }
+    
+    public boolean clearEdges() {
+	edges = new Matrix();
+	return true;
+    }
+    public boolean clearTransform() {
+	transform = Matrix.identity(4);
 	return true;
     }
 

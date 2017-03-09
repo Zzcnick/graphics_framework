@@ -41,6 +41,9 @@ public class Pixel {
     public int[] getRGB() {
 	return new int[]{R, G, B};
     }
+    public Pixel copy() {
+	return new Pixel(R, G, B);
+    }
 
     // Methods
     public int[] adjust(int dR, int dG, int dB) {
