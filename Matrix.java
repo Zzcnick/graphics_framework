@@ -86,7 +86,6 @@ public class Matrix {
 	return true;
     }
 
-
     // Accessors + Mutators
     public double get(int r, int c) {
 	return matrix.get(c)[r];
