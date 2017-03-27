@@ -18,8 +18,14 @@ public class Picture {
 		if (cmd.equals("line")) {
 		    c.edge(sc.nextDouble(), sc.nextDouble(), sc.nextDouble(),
 			   sc.nextDouble(), sc.nextDouble(), sc.nextDouble());
-		} else if (cmd.equals("ident")) {
-		    c.clearTransform();
+		} else if (cmd.equals("bezier")) {
+		    c.bezier(sc.nextDouble(), sc.nextDouble(), sc.nextDouble(), sc.nextDouble(),
+			     sc.nextDouble(), sc.nextDouble(), sc.nextDouble(), sc.nextDouble());
+		} else if (cmd.equals("hermite")) {
+		    c.hermite(sc.nextDouble(), sc.nextDouble(), sc.nextDouble(), sc.nextDouble(),
+			      sc.nextDouble(), sc.nextDouble(), sc.nextDouble(), sc.nextDouble());
+		} else if (cmd.equals("circle")) {
+		    c.circle(sc.nextDouble(), sc.nextDouble(), sc.nextDouble(), sc.nextDouble());
 		} else if (cmd.equals("scale")) {
 		    c.scale(sc.nextDouble(), sc.nextDouble(), sc.nextDouble());
 		} else if (cmd.equals("move")) {
@@ -28,6 +34,8 @@ public class Picture {
 		    c.rotate(sc.next().charAt(0), sc.nextDouble());
 		} else if (cmd.equals("apply")) {
 		    c.apply();
+		} else if (cmd.equals("ident")) {
+		    c.clearTransform();
 		} else if (cmd.equals("draw")) {
 		    c.draw();
 		} else if (cmd.equals("save")) {
@@ -36,133 +44,178 @@ public class Picture {
 	    }
 	    return;
 	} 
-	
-	/* // Transform ==========================
-	Canvas c = new Canvas(500, 500, 20, 0, 20);
-	double x = 0; double y = 0;
-	double r = 0; double a = 0;
-	int R, G, B; R = 0; G = 0; B = 0;
-	double tmp = 25 * Math.random();
-	int frame = 0;
+	// Curves  ============================
+	Canvas c = new Canvas(500, 500, 0, 40, 60);
+	Pixel p = new Pixel(240, 250, 255);
+	// int frame = 0;
 
-	// Background
-	for (int i = 0; i < 150; i++) {
-	    R = 155 + (int)(100 * Math.random());
-	    G = 155 + (int)(100 * Math.random());
-	    B = 155 + (int)(100 * Math.random());
-	    Pixel p = new Pixel(R, G, B);
-	    r = 2 + (int)(3 * Math.random());
-	    x = 20 + (int)(460 * Math.random());
-	    y = 20 + (int)(460 * Math.random());
-	    c.edge(x - r, y, x + r, y, p);
-	    c.edge(x, y - r, x, y + r, p);
+ 	// c.savestate(); // Background
+	for (int i = 0; i < 3; i++) {
+	    // Left Eye
+	    c.hermite(100,325+i,200,325+i,50+i,75+i,50+i,-75+i,p);
+	    c.circle(160, 325, 0, 18+i, p);
+	    
+	    // Right Eye
+	    c.hermite(300,325+i,400,325+i,50+i,75+i,50+i,-75+i,p);
+	    c.circle(360, 325, 0, 18+i, p);
+	    
+	    // Nose
+	    c.line(230 + i, 340,
+		   230 + i, 290, p);
+	    c.bezier(230 + i, 290 - i, 305 + i, 320 + i,
+		     305 + i, 210 - i, 230 + i, 240 + i, p);
+		
+	    // Mouth
+	    c.hermite(170,220-i,330,220-i,
+		      75, -100, 75, 100, p);
 	}
 	c.draw();
-	c.clearEdges();
-	c.savestate();
+	c.save("out.ppm");
 
-	// Inner Ring - Back
-	for (int i = 0; i < 250; i++) {
-	    R = 180 + (int)(50 * Math.random());
-	    G = R;
-	    B = 20;
-	    Pixel p = new Pixel(R, G, B);
-	    r = 50 + 50 * Math.random();
-	    a = Math.random() * Math.PI - Math.PI / 2;
-	    x = r * Math.cos(a);
-	    y = r * Math.sin(a);
-	    double extension = 5 + 10 * Math.random();
-	    double dx, dy;
-	    dx = extension * Math.sin(a);
-	    dy = extension * Math.cos(a);
-	    c.edge(x + dx,
-		   y - dy,
-		   x - dx,
-		   y + dy,
-		   p);
-	}
+	// GIF
+	// for (int r = 0; r < 360; r += 3) {
+	//     c.load();
+	//     frame++;
 
-	// Nucleus
-	for (int fold = 0; fold < 360; fold += 10) {
-	    for (int i = 0; i < 360; i += (int)(25 * Math.random())) {
-		R = 150 + (int)(106 * Math.random());
-		G = 100;
-		B = 20;
-		Pixel p = new Pixel(R, G, B);
-		x = 40 * Math.cos(2 * Math.PI * i / 360);
-		y = 40 * Math.sin(2 * Math.PI * i / 360);
-		c.edge(0,0,x,y,p);
-	    }
-	    c.rotate('x', 10);
-	    c.apply();
-	}
-
-	// Inner Ring - Front
-	for (int i = 0; i < 250; i++) {
-	    R = 180 + (int)(50 * Math.random());
-	    G = R;
-	    B = 30;
-	    Pixel p = new Pixel(R, G, B);
-	    r = 50 + 50 * Math.random();
-	    a = Math.random() * Math.PI + Math.PI / 2;
-	    x = r * Math.cos(a);
-	    y = r * Math.sin(a);
-	    double extension = 5 + 10 * Math.random();
-	    double dx, dy;
-	    dx = extension * Math.sin(a);
-	    dy = extension * Math.cos(a);
-	    c.edge(x + dx,
-		   y - dy,
-		   x - dx,
-		   y + dy,
-		   p);
-	}
-
-	// Outer Ring
-	for (int i = 0; i < 250; i++) {
-	    R = 130 + (int)(50 * Math.random());
-	    G = R - 10;
-	    B = 10;
-	    Pixel p = new Pixel(R, G, B);
-	    r = 100 + 100 * Math.random();
-	    a = Math.random() * 2 * Math.PI;
-	    x = r * Math.cos(a);
-	    y = r * Math.sin(a);
-	    double extension = 15 + 10 * Math.random();
-	    double dx, dy;
-	    dx = extension * Math.sin(a);
-	    dy = extension * Math.cos(a);
-	    c.edge(x + dx,
-		   y - dy,
-		   x - dx,
-		   y + dy,
-		   p);
-	}
-
-	c.rotate('x', 60);
-	c.rotate('y', 30);
-	
-	 // while (frame < 180) {
-	 //    String buffer = "" + frame;
-	 //    while (buffer.length() < 3)
-	 // 	buffer = "0" + buffer;
-
-	 // c.rotate('y', 2);
-	    c.translate(250, 250, 250);
-	    c.apply();
-
-	    c.draw();
-
-	    c.save("out.ppm");
-
-	    // c.translate(-250, -250, -250);
-	    // c.apply();
-
-	    // c.load();
-	    // frame++;
-	    // } // End Animation Loop
-
+	//     String buffer = "" + frame;
+	//     while (buffer.length() < 3)
+	//    	buffer = "0" + buffer;
+	//     c.draw();
+	//     c.save(buffer + ".ppm");
+	    
+	//     c.translate(-250,0,0);
+	//     c.rotate('y', 3);
+	//     c.translate(250,0,0);
+	//     c.apply();
+	// }
 	// ==================================== */
+	
+	/* // Transform ==========================
+	   Canvas c = new Canvas(500, 500, 20, 0, 20);
+	   double x = 0; double y = 0;
+	   double r = 0; double a = 0;
+	   int R, G, B; R = 0; G = 0; B = 0;
+	   double tmp = 25 * Math.random();
+	   int frame = 0;
+
+	   // Background
+	   for (int i = 0; i < 150; i++) {
+	   R = 155 + (int)(100 * Math.random());
+	   G = 155 + (int)(100 * Math.random());
+	   B = 155 + (int)(100 * Math.random());
+	   Pixel p = new Pixel(R, G, B);
+	   r = 2 + (int)(3 * Math.random());
+	   x = 20 + (int)(460 * Math.random());
+	   y = 20 + (int)(460 * Math.random());
+	   c.edge(x - r, y, x + r, y, p);
+	   c.edge(x, y - r, x, y + r, p);
+	   }
+	   c.draw();
+	   c.clearEdges();
+	   c.savestate();
+
+	   // Inner Ring - Back
+	   for (int i = 0; i < 250; i++) {
+	   R = 180 + (int)(50 * Math.random());
+	   G = R;
+	   B = 20;
+	   Pixel p = new Pixel(R, G, B);
+	   r = 50 + 50 * Math.random();
+	   a = Math.random() * Math.PI - Math.PI / 2;
+	   x = r * Math.cos(a);
+	   y = r * Math.sin(a);
+	   double extension = 5 + 10 * Math.random();
+	   double dx, dy;
+	   dx = extension * Math.sin(a);
+	   dy = extension * Math.cos(a);
+	   c.edge(x + dx,
+	   y - dy,
+	   x - dx,
+	   y + dy,
+	   p);
+	   }
+
+	   // Nucleus
+	   for (int fold = 0; fold < 360; fold += 10) {
+	   for (int i = 0; i < 360; i += (int)(25 * Math.random())) {
+	   R = 150 + (int)(106 * Math.random());
+	   G = 100;
+	   B = 20;
+	   Pixel p = new Pixel(R, G, B);
+	   x = 40 * Math.cos(2 * Math.PI * i / 360);
+	   y = 40 * Math.sin(2 * Math.PI * i / 360);
+	   c.edge(0,0,x,y,p);
+	   }
+	   c.rotate('x', 10);
+	   c.apply();
+	   }
+
+	   // Inner Ring - Front
+	   for (int i = 0; i < 250; i++) {
+	   R = 180 + (int)(50 * Math.random());
+	   G = R;
+	   B = 30;
+	   Pixel p = new Pixel(R, G, B);
+	   r = 50 + 50 * Math.random();
+	   a = Math.random() * Math.PI + Math.PI / 2;
+	   x = r * Math.cos(a);
+	   y = r * Math.sin(a);
+	   double extension = 5 + 10 * Math.random();
+	   double dx, dy;
+	   dx = extension * Math.sin(a);
+	   dy = extension * Math.cos(a);
+	   c.edge(x + dx,
+	   y - dy,
+	   x - dx,
+	   y + dy,
+	   p);
+	   }
+
+	   // Outer Ring
+	   for (int i = 0; i < 250; i++) {
+	   R = 130 + (int)(50 * Math.random());
+	   G = R - 10;
+	   B = 10;
+	   Pixel p = new Pixel(R, G, B);
+	   r = 100 + 100 * Math.random();
+	   a = Math.random() * 2 * Math.PI;
+	   x = r * Math.cos(a);
+	   y = r * Math.sin(a);
+	   double extension = 15 + 10 * Math.random();
+	   double dx, dy;
+	   dx = extension * Math.sin(a);
+	   dy = extension * Math.cos(a);
+	   c.edge(x + dx,
+	   y - dy,
+	   x - dx,
+	   y + dy,
+	   p);
+	   }
+
+	   c.rotate('x', 60);
+	   c.rotate('y', 30);
+	
+	   // while (frame < 180) {
+	   //    String buffer = "" + frame;
+	   //    while (buffer.length() < 3)
+	   // 	buffer = "0" + buffer;
+
+	   // c.rotate('y', 2);
+	   c.translate(250, 250, 250);
+	   c.apply();
+
+	   c.draw();
+
+	   c.save("out.ppm");
+
+	   // c.translate(-250, -250, -250);
+	   // c.apply();
+
+	   // c.load();
+	   // frame++;
+	   // } // End Animation Loop
+
+	   // ==================================== */
 
 	/* // EdgeMatrix =========================
 	   Canvas c = new Canvas(500, 500, 0, 0, 0);

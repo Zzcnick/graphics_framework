@@ -51,7 +51,6 @@ public class Pixel {
 	R += dR; G += dG; B += dB;
 	return old;
     }
-    
 
     // ToString Utility
     public String toString() {
