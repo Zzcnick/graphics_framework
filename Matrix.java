@@ -85,6 +85,18 @@ public class Matrix {
 	colors.add(p);
 	return true;
     }
+    
+    // Passes Copies, Not References
+    public int append(Matrix m) {
+	int l = m.getColumns();
+	int i = 0;
+	ArrayList<Pixel> ps = m.getColors();
+	while (i < l) {
+	    add_edge(m.getColumn(i), m.getColumn(i+1), m.getColor(i/2));
+	    i+=2;
+	}
+	return i;
+    }
 
     // Accessors + Mutators
     public double get(int r, int c) {
@@ -112,6 +124,16 @@ public class Matrix {
 	for (int i = 0; i < rows; i++)
 	    ret[i] = matrix.get(c)[i];
 	return ret;
+    }
+    public ArrayList<double[]> getEdges() {
+	return matrix;
+    }
+
+    public Pixel getColor(int i) {
+	return colors.get(i);
+    }
+    public ArrayList<Pixel> getColors() {
+	return colors;
     }
 
     // Matrix Functions

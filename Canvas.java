@@ -121,6 +121,98 @@ public class Canvas {
 	return circle(cx, cy, z, r, new Pixel(0,0,0));
     }
 
+    public boolean box(double x, double y, double z, 
+		       double dx, double dy, double dz, Pixel p) {
+	Matrix em = box_edges(x,y,z,dx,dy,dz,p);
+	edges.append(em);
+	return true;
+    }
+    public boolean box(double x, double y, double z, 
+		       double dx, double dy, double dz) {
+	return box(x, y, z, dx, dy, dz, new Pixel(0,0,0));
+    }
+    public Matrix box_edges(double x, double y, double z, 
+			    double dx, double dy, double dz, Pixel p) {
+	Matrix em = new Matrix();
+	em.add_edge(x,y,z,x+dx,y,z,p);
+	em.add_edge(x,y,z,x,y-dy,z,p);
+	em.add_edge(x,y,z,x,y,z-dz,p);
+	em.add_edge(x+dx,y,z,x+dx,y-dy,z,p);
+	em.add_edge(x+dx,y,z,x+dx,y,z-dz,p);
+	em.add_edge(x,y-dy,z,x+dx,y-dy,z,p);
+	em.add_edge(x,y-dy,z,x,y-dy,z-dz,p);
+	em.add_edge(x,y,z-dz,x+dx,y,z-dz,p);
+	em.add_edge(x,y,z-dz,x,y-dy,z-dz,p);
+	em.add_edge(x+dx,y-dy,z,x+dx,y-dy,z-dz,p);
+	em.add_edge(x+dx,y,z-dz,x+dx,y-dy,z-dz,p);
+	em.add_edge(x,y-dy,z-dz,x+dx,y-dy,z-dz,p);
+	return em;
+    }
+    public Matrix box_edges(double x, double y, double z, 
+			    double dx, double dy, double dz) {
+	    return box_edges(x, y, z, dx, dy, dz, new Pixel(0,0,0));
+    }
+
+    public boolean sphere(double cx, double cy, double cz, double r, Pixel p) {
+	Matrix em = sphere_edges(cx,cy,cz,r,p);
+	edges.append(em);
+	return true;
+    }
+    public boolean sphere(double cx, double cy, double cz, double r) {
+	return sphere(cx, cy, cz, r, new Pixel(0,0,0));
+    }
+    public Matrix sphere_edges(double cx, double cy, double cz, double r, Pixel p) {
+	Matrix em = new Matrix();
+	double s; // Semicircle
+	double t; // Rotation
+	double ds = Math.PI / 45; // Semicircle Step
+	double dt = ds; // Rotation Step
+	double x, y, z;
+	for (t = 0; t < 2 * Math.PI + dt/2; t += dt) {
+	    for (s = 0; s < Math.PI + ds/2; s += ds) {
+		x = r * Math.cos(t) * Math.cos(s) + cx;
+		y = r * Math.cos(t) * Math.sin(s) + cy;
+		z = r * Math.sin(t) + cz;
+		em.add_edge(x, y, z, x, y, z, p); // Change Later
+	    }
+	}
+	return em;
+    }
+    public Matrix sphere_edges(double cx, double cy, double cz, double r) {
+	return sphere_edges(cx, cy, cz, r, new Pixel(0,0,0));
+    }
+
+    public boolean torus(double cx, double cy, double cz, double r, double R, Pixel p) {
+	Matrix em = torus_edges(cx,cy,cz,r,R,p);
+	edges.append(em);
+	return true;
+    }
+    public boolean torus(double cx, double cy, double cz, double r, double R) {
+	return torus(cx, cy, cz, r, R, new Pixel(0,0,0));
+    }
+    // To Make More Efficient
+    public Matrix torus_edges(double cx, double cy, double cz, double r, double R, Pixel p) {
+	Matrix em = new Matrix();
+	double s; // Circle
+	double t; // Rotation
+	double ds = Math.PI / 60; // Circle Step
+	double dt = ds * 2; // Rotation Step
+	double x, y, z;
+	for (t = 0; t < 2 * Math.PI + dt/2; t += dt) {
+	    for (s = 0; s < 2 * Math.PI + ds/2; s += ds) {
+		double Rr = (r * Math.cos(s) + R);
+		x = Rr * Math.cos(t) + cx;
+		y = Rr * Math.sin(t) + cy;
+		z = r * Math.sin(s) + cz;
+		em.add_edge(x, y, z, x, y, z, p); // Change Later
+	    }
+	}
+	return em;
+    }
+    public Matrix torus_edges(double cx, double cy, double cz, double r, double R) {
+	return torus_edges(cx, cy, cz, r, R, new Pixel(0,0,0));
+    }
+	
     public boolean hermite(double x0, double y0, double x1, double y1,
 			   double dx0, double dy0, double dx1, double dy1, Pixel p) {
 	// Why Use A Matrix When You Can Just Multiply? Efficiency is important! 

@@ -5,3 +5,5 @@ Framework for a graphics engine in Java.
  * Drawing Lines
  * Vectorization Implementation
  * Simple Transformations
+ * Hermite and Bezier Curves
+ * Three Dimensional Shapes
