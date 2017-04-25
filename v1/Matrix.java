@@ -85,17 +85,34 @@ public class Matrix {
 	colors.add(p);
 	return true;
     }
+
+    public boolean add_triangle(double x1, double y1, double z1,
+				double x2, double y2, double z2,
+				double x3, double y3, double z3, Pixel p) {
+	add_point(x1, y1, z1);
+	add_point(x2, y2, z2);
+	add_point(x3, y3, z3);
+	size++;
+	colors.add(p);
+	return true;
+    }
+    public boolean add_triangle(double x1, double y1, double z1,
+				double x2, double y2, double z2,
+				double x3, double y3, double z3) {
+	return add_triangle(x1,y1,z1,x2,y2,z2,x3,y3,z3,new Pixel(0,0,0));
+    }
     
     // Passes Copies, Not References
     public int append(Matrix m) {
 	int l = m.getColumns();
-	int i = 0;
 	ArrayList<Pixel> ps = m.getColors();
-	while (i < l) {
-	    add_edge(m.getColumn(i), m.getColumn(i+1), m.getColor(i/2));
-	    i+=2;
-	}
-	return i;
+	for (int i = 0; i < l; i++)
+	    add_point(m.getColumn(i));
+	for (Pixel p : ps)
+	    colors.add(p);
+	// System.out.println(this); // Debugging
+	// System.out.println(ps); // Debugging
+	return l;
     }
 
     // Accessors + Mutators

@@ -53,6 +53,8 @@ public class Picture {
 		    c.draw();
 		} else if (cmd.equals("save")) {
 		    c.save(sc.next());
+		} else if (cmd.equals("mode")) {
+		    c.setMode(sc.nextInt());
 		} else if (cmd.equals("reset")) {
 		    c = new Canvas(sc.nextInt(), sc.nextInt(),
 				   sc.nextInt(), sc.nextInt(), sc.nextInt());
@@ -60,6 +62,54 @@ public class Picture {
 	    }
 	    return;
 	} 
+
+	// Polygons ===========================
+	Canvas c = new Canvas(500, 500, 255, 255, 255, 3);
+	Pixel p = new Pixel(0,0,0);
+	
+	int frame = 0;
+	c.savestate(); // Background
+	
+	// Debris Generation
+	for (int i = 0; i < 100; i++) { // Particle Count
+	    double size = 3 + Math.random() * 22;
+	    c.box(150 + Math.random() * 200, 0, 0,
+		  size, size, size);
+	    c.rotate('x', Math.random() * 360);
+	    c.rotate('y', Math.random() * 360);
+	    c.rotate('z', Math.random() * 360);
+	    c.apply();
+	}
+
+	c.sphere(0,0,0,80);
+	c.torus(0,0,0,24,120);
+	c.rotate('x', 30);
+	c.rotate('y', 30);
+
+	c.translate(250,250,0);
+	c.apply();
+	
+	// Single Frame
+	c.draw();
+	c.save("out.ppm");
+
+ 	// GIF
+	// for (int r = 0; r < 360; r += 3) {
+	//     String buffer = "" + frame;
+	//     while (buffer.length() < 3)
+	//    	buffer = "0" + buffer;
+	//     c.draw();
+	//     c.save(buffer + ".ppm");
+	//     c.load();
+
+	//     frame++;
+	//     c.translate(-250,-250,0);
+	//     c.rotate('y', 3);
+	//     c.translate(250,250,0);
+	//     c.apply();
+	// }
+	// ==================================== */
+
 
 	/* // Curves  ============================
 	Canvas c = new Canvas(500, 500, 0, 40, 60);

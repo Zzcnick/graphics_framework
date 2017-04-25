@@ -7,3 +7,4 @@ Framework for a graphics engine in Java.
  * Simple Transformations
  * Hermite and Bezier Curves
  * Three Dimensional Shapes
+ * Polygonal Meshes
