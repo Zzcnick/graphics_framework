@@ -8,3 +8,4 @@ Framework for a graphics engine in Java.
  * Hermite and Bezier Curves
  * Three Dimensional Shapes
  * Polygonal Meshes
+ * Stack Implementation for Objects
