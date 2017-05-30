@@ -8,6 +8,7 @@ public class Pixel {
     private int R;
     private int G;
     private int B;
+    private double Z = Integer.MIN_VALUE;
 
     // Constructors
     public Pixel() { // White Pixel
@@ -20,14 +21,23 @@ public class Pixel {
 	this.G = G;
 	this.B = B;
     }
+    public Pixel(int R, int G, int B, double Z) {
+	this(R,G,B);
+	this.Z = Z;
+    }
     public Pixel(int[] RGB) {
 	this(RGB[0], RGB[1], RGB[2]);
+    }
+    public Pixel(int[] RGB, double Z) {
+	this(RGB[0], RGB[1], RGB[2]);
+	this.Z = Z;
     }
     public Pixel(Pixel p) {
 	int[] rgb = p.getRGB();
 	R = rgb[0];
 	G = rgb[1];
 	B = rgb[2];
+	Z = p.getZ();
     }
     public Pixel(int flag) {
 	if (flag == 1) { // Random
@@ -41,6 +51,9 @@ public class Pixel {
     public int[] getRGB() {
 	return new int[]{R, G, B};
     }
+    public double getZ() {
+	return Z;
+    }
     public Pixel copy() {
 	return new Pixel(R, G, B);
     }
@@ -50,6 +63,9 @@ public class Pixel {
 	int[] old = getRGB();
 	R += dR; G += dG; B += dB;
 	return old;
+    }
+    public boolean compareZ(Pixel p) {
+	return Z >= p.getZ();
     }
 
     // ToString Utility

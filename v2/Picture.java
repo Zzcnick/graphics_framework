@@ -122,8 +122,20 @@ public class Picture {
 		// System.out.println("COMMAND: " + buffer); // Debugging
 		// System.out.println("TYPES  : " + typebuffer); // Debugging
 	    }
-	    return;
-	} 
+	} // End Parser
+	else {
+	    // Testing Space
+	    Canvas c = new Canvas();
+	    Matrix em = c.getEdges();
+	    em.add_triangle(100,100,100,
+			    200,100,100,
+			    150,150,100);
+
+	    c.draw(2);
+	    c.save("tri.ppm");
+	    System.out.println("Execution complete.");
+	}
+	return;
     }
 
     // Execution Helper - Type Checking
@@ -296,7 +308,6 @@ public class Picture {
 	    // Check if Command Executed
 	    if (!executed)    
 		System.out.println("ERROR: " + buffer + " does not match any implementation of " + cmd);
-
 	    buffer.clear();
 	    typebuffer.clear();
 	}

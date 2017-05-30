@@ -9,3 +9,5 @@ Framework for a graphics engine in Java.
  * Three Dimensional Shapes
  * Polygonal Meshes
  * Stack Implementation for Objects
+ * Knobs for Animation
+ * Triangular Object Rendering
