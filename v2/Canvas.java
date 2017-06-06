@@ -380,7 +380,7 @@ public class Canvas {
 	Matrix em = new Matrix();
 	double s; // Circle
 	double t; // Rotation
-	int n = 10; // Steps / 2
+	int n = 3; // Steps / 2
 	double ds = Math.PI / n; // Circle Step
 	double dt = ds / 2; // Rotation Step
 	double x, y, z;
@@ -601,59 +601,68 @@ public class Canvas {
 
 		    // /* Filled Triangle
 		    int yi1 = (int)y1; int yi2 = (int)y2; int yi3 = (int)y3; 
+		    double z1 = p1[2]; double z2 = p2[2]; double z3 = p3[2];
 		    int ty, my, by;
-		    double tx, mx, bx; // tz, mz, bz;
+		    double tx, mx, bx, tz, mz, bz;
 		    // Determining Triangle Order
 		    if (yi1 > yi2) { // y3? > y1 > y3? > y2 > y3?
 			if (yi1 > yi3) { // y1 > [ y2 >? y3 ]
-			    ty = yi1; tx = x1; // tz = z1;
+			    ty = yi1; tx = x1; tz = z1;
 			    if (yi3 > yi2) { // y1 > y3 > y2
-				my = yi3; mx = x3; // mz = z3;
-				by = yi2; bx = x2; // bz = z2;
+				my = yi3; mx = x3; mz = z3;
+				by = yi2; bx = x2; bz = z2;
 			    } else { // y1 > y2 > y3
-				my = yi2; mx = x2; // mz = z2;
-				by = yi3; bx = x3; // bz = z3;
+				my = yi2; mx = x2; mz = z2;
+				by = yi3; bx = x3; bz = z3;
 			    }
 			} else { // y3 > y1 > y2 
-			    ty = yi3; tx = x3; // tz = z3;
-			    my = yi1; mx = x1; // mz = z1;
-			    by = yi2; bx = x2; // bz = z2;
+			    ty = yi3; tx = x3; tz = z3;
+			    my = yi1; mx = x1; mz = z1;
+			    by = yi2; bx = x2; bz = z2;
 			}
 		    } else { // y3? > y2 > y3? > y1 > y3?
 			if (yi2 > yi3) { // y2 > [ y1 >? y3 ]
-			    ty = yi2; tx = x2; // tz = z2;
+			    ty = yi2; tx = x2; tz = z2;
 			    if (yi3 > yi1) { // y2 > y3 > y1
-				my = yi3; mx = x3; // mz = z3;
-				by = yi1; bx = x1; // bz = z1;
+				my = yi3; mx = x3; mz = z3;
+				by = yi1; bx = x1; bz = z1;
 			    } else { // y2 > y1 > y3
-				my = yi1; mx = x1; // mz = z1;
-				by = yi3; bx = x3; // bz = z3;
+				my = yi1; mx = x1; mz = z1;
+				by = yi3; bx = x3; bz = z3;
 			    }
 			} else { // y3 > y2 > y1
-			    ty = yi3; tx = x3; // tz = z3;
-			    my = yi2; mx = x2; // mz = z2;
-			    by = yi1; bx = x1; // bz = z1;
+			    ty = yi3; tx = x3; tz = z3;
+			    my = yi2; mx = x2; mz = z2;
+			    by = yi1; bx = x1; bz = z1;
 			}
 		    }
-
-		    /* System.out.println("top: " + tx + "," + ty + "\n" + 
-		       "mid: " + mx + "," + my + "\n" + 
-		       "bot: " + bx + "," + by); // */ // Debugging 
+		    
+		    /* System.out.println("top: " + tx + "," + ty + "," + tz + "\n" + 
+				       "mid: " + mx + "," + my + "," + mz + "\n" + 
+				       "bot: " + bx + "," + by + "," + bz); // */ // Debugging 
 
 		    double xL = bx; // bx -> tx
 		    double xR = bx; // bx -> mx -> tx
+		    double zL = bz; // bz -> tz
+		    double zR = bz; // bz -> mz -> tz
 		    double dxL = (ty == by) ? 0 : (tx - bx) / (ty - by); // Slope of Longer Side
 		    double dxR = (my == by) ? 0 : (mx - bx) / (my - by); // Slope of Shorter Side - Changes
+		    double dzL = (ty == by) ? 0 : (tz - bz) / (ty - by); // Slope of Longer Size (Z)
+		    double dzR = (ty == by) ? 0 : (mz - bz) / (my - by); // Slope of Shorter Side - Changes
 		    // System.out.println("dx0:\t" + dx0 + "\tdx1:\t" + dx1); // Debugging
 		    // Bottom Up Traversal
 		    for (int y = by; y <= ty; y++) {
 			// System.out.println("y: " + y + "\txL:\t" + xL + "\txR:\t" + xR); // Debugging
 			if (y == my) { // Switch Slope of Shorter Side
 			    dxR = (ty == my) ? 0 : (tx - mx) / (ty - my);
+			    dzR = (ty == my) ? 0 : (tz - mz) / (ty - my);
 			    xR = mx;
+			    zR = mz;
 			}
-			line((int)xL, y, (int)xR, y, p);
+			line((int)xL, y, zL, (int)xR, y, zR, p);
+			// System.out.println("zL: " + zL + "\tzR: " + zR); // Debugging
 			xL += dxL; xR += dxR; 
+			zL += dzL; zR += dzR;
 		    }
 		    // */	
 		} // End Triangle
@@ -677,10 +686,13 @@ public class Canvas {
     public boolean draw_pixel(int x, int y, Pixel p) {
 	if (x < 0 || x >= this.x || y < 0 || y >= this.y)
 	    return false;
-	if (canvas[y][x].equals(null) || p.compareZ(canvas[y][x]))
+	if (p.compareZ(canvas[y][x])) // Z Buffering
 	    canvas[y][x] = p;
 	return true;
     }
+    public boolean draw_pixel(int x, int y, double Z, Pixel p) {
+	return draw_pixel(x, y, new Pixel(p.getRGB(), Z));
+			  }
     public boolean draw_pixel(int x, int y) {
 	return draw_pixel(x, y, new Pixel(0, 0, 0));
     }
@@ -722,90 +734,115 @@ public class Canvas {
     }
 
     // Bresenham's Line Algorithm - 8 Octants
-    public boolean line(int x1, int y1, int x2, int y2) {
-	return line(x1, y1, x2, y2, new Pixel(0, 0, 0));
+    public boolean line(int x1, int y1, double z1, int x2, int y2, double z2) {
+	return line(x1, y1, z1, x2, y2, z2, new Pixel(0,0,0));
     }
-    public boolean line(int x1, int y1, int x2, int y2, Pixel p) {
-	if (x2 < x1) return line(x2, y2, x1, y1, p);
+    public boolean line(int x1, int y1, double z1, int x2, int y2, double z2, Pixel p) {
+	if (x2 < x1) return line(x2, y2, z2, x1, y1, z1, p);
 	int dy = y2 > y1 ? y2 - y1 : y1 - y2; // positive difference
 	int dx = x2 - x1; // always positive
 	int m = y2 > y1 ? 1 : -1;
 	if (dy > dx)
-	    if (m > 0)
-		return line2(x1, y1, x2, y2, p); // Vertical - Octant 2
-	    else
-		return line7(x1, y1, x2, y2, p); // Vertical - Octant 7
+	    if (m > 0) {
+		// return line2(x1, y1, x2, y2, p); // Vertical - Octant 2 - No Z Buffering
+		return line2(x1, y1, z1, x2, y2, z2, p); // Vertical - Octant 2
+	    } else {
+		// return line7(x1, y1, x2, y2, p); // Vertical - Octant 7 - No Z Buffering
+		return line7(x1, y1, z1, x2, y2, z2, p); // Vertical - Octant 7
+	    }
 	else
-	    if (m > 0)
-		return line1(x1, y1, x2, y2, p); // Horizontal - Octant 1
-	    else
-		return line8(x1, y1, x2, y2, p); // Horizontal - Octant 8
+	    if (m > 0) {
+		// return line1(x1, y1, x2, y2, p); // Horizontal - Octant 1 - No Z Buffering
+		return line1(x1, y1, z1, x2, y2, z2, p); // Horizontal - Octant 1
+	    } else {
+		// return line8(x1, y1, x2, y2, p); // Horizontal - Octant 8 - No Z Buffering	
+		return line8(x1, y1, z1, x2, y2, z2, p); // Horizontal - Octant 8
+	    }
     }
-    public boolean line7(int x1, int y1, int x2, int y2, Pixel p) {
+    public boolean line(int x1, int y1, int x2, int y2) {
+	return line(x1, y1, x2, y2, new Pixel(0, 0, 0));
+    }
+    public boolean line(int x1, int y1, int x2, int y2, Pixel p) {
+	return line(x1, y1, 0, x2, y2, 0, p);
+    }
+    public boolean line7(int x1, int y1, double z1, int x2, int y2, double z2, Pixel p) {
 	int A = y2 - y1; // dy
 	int B = x1 - x2; // -dx
 	int d = -2 * B + A;
+	double Z = z1; // Starting Z
+	double dZ = y2 == y1 ? 0 : (z2 - z1) / (y1 - y2); // dZ
 	A = 2 * A;
 	B = -2 * B;
 	while (y1 >= y2) {
-	    draw_pixel(x1, y1, p);
+	    
+	    draw_pixel(x1, y1, Z, p);
 	    if (d > 0) {
 		x1++;
 		d += A;
 	    }
 	    y1--;
 	    d += B;
+	    Z += dZ; // Adding dZ
 	}
 	return true;
     }
-    public boolean line2(int x1, int y1, int x2, int y2, Pixel p) {
+    public boolean line2(int x1, int y1, double z1, int x2, int y2, double z2, Pixel p) {
 	int A = y2 - y1; // dy
 	int B = x1 - x2; // -dx
 	int d = 2 * B + A;
+	double Z = z1; // Starting Z
+	double dZ = y2 == y1 ? 0 : (z2 - z1) / (y2 - y1); // dZ
 	A = 2 * A;
 	B = 2 * B;
 	while (y1 <= y2) {
-	    draw_pixel(x1, y1, p);
+	    draw_pixel(x1, y1, Z, p);
 	    if (d < 0) {
 		x1++;
 		d += A;
 	    }
 	    y1++;
 	    d += B;
+	    Z += dZ; // Adding dZ
 	}
 	return true;
     }
-    public boolean line8(int x1, int y1, int x2, int y2, Pixel p) {
+    public boolean line8(int x1, int y1, double z1, int x2, int y2, double z2, Pixel p) {
 	int A = y2 - y1; // dy
 	int B = x1 - x2; // -dx
 	int d = 2 * A - B;
 	A = 2 * A;
 	B = -2 * B;
+	double Z = z1; // Starting Z
+	double dZ = y2 == y1 ? 0 : (z2 - z1) / (x2 - x1); // dZ
 	while (x1 <= x2) {
-	    draw_pixel(x1, y1, p);
+	    draw_pixel(x1, y1, Z, p);
 	    if (d < 0) {
 		y1--;
 		d += B;
 	    }
 	    x1++;
 	    d += A;
+	    Z += dZ; // Adding dZ
 	}
 	return true;
     }
-    public boolean line1(int x1, int y1, int x2, int y2, Pixel p) {
+    public boolean line1(int x1, int y1, double z1, int x2, int y2, double z2, Pixel p) {
 	int A = y2 - y1; // dy
 	int B = x1 - x2; // -dx
 	int d = 2 * A + B;
+	double Z = z1; // Starting Z
+	double dZ = y2 == y1 ? 0 : (z2 - z1) / (x2 - x1); // dZ
 	A = 2 * A;
 	B = 2 * B;
 	while (x1 <= x2) {
-	    draw_pixel(x1, y1, p);
+	    draw_pixel(x1, y1, Z, p);
 	    if (d > 0) {
 		y1++;
 		d += B;
 	    }
 	    x1++;
 	    d += A;
+	    Z += dZ; // Adding dZ
 	}
 	return true;
     }
@@ -821,6 +858,26 @@ public class Canvas {
 	    for (int j = 0; j < x; j++) {
 		// System.out.printf("x: %d\ty: %d\n", j, i); // Debugging
 		pw.print(canvas[i][j]);
+	    }
+	}
+	pw.close();
+	return true;
+    }
+
+    // Z Buffering Debugging
+    public boolean savez(String name) throws FileNotFoundException {
+	PrintWriter pw = new PrintWriter(new File(name));
+	pw.print("P3 " + x + " " + y + " 255\n"); // Heading
+	for (int i = y - 1; i > -1; i--) {
+	    for (int j = 0; j < x; j++) {
+		// System.out.printf("x: %d\ty: %d\n", j, i); // Debugging
+		double Z = canvas[i][j].getZ();
+		int low = 0;
+		int high = 500;
+		int scaledZ = (int)((Z - low) * 255 / (high - low));
+		if (scaledZ < 0) scaledZ = 0;
+		else if (scaledZ > 255) scaledZ = 255;
+		pw.print(new Pixel(scaledZ, scaledZ, scaledZ));
 	    }
 	}
 	pw.close();

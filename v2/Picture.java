@@ -127,12 +127,17 @@ public class Picture {
 	    // Testing Space
 	    Canvas c = new Canvas();
 	    Matrix em = c.getEdges();
+
+	    em.add_triangle(100,150,100,
+			    150,100,500,
+			    200,150,100);
 	    em.add_triangle(100,100,100,
 			    200,100,100,
-			    150,150,100);
-
-	    c.draw(2);
+			    150,150,500);
+	    System.out.println(em);
+	    c.draw(3);
 	    c.save("tri.ppm");
+	    c.savez("triz.ppm");
 	    System.out.println("Execution complete.");
 	}
 	return;
@@ -168,7 +173,7 @@ public class Picture {
 	    while (cmdpad.length() < pad)
 		cmdpad += " ";
 	    if (c.getFramecount() == 1)
-		System.out.println("Executing Command: " + cmdpad + "| Inputs: " + buffer); // Debugging
+		System.out.println("Executing Command: " + cmdpad + "| Inputs: " + buffer); // Debugging - Keep On
 	    
 	    boolean executed = false;
 	    if (cmd.equals("line")) {

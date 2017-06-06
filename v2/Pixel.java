@@ -45,6 +45,11 @@ public class Pixel {
 	    G = (int)(Math.random() * 256);
 	    B = (int)(Math.random() * 256);
 	}
+	if (flag == 2) { // Red Shades
+	    R = (int)(Math.random() * 200 + 56);
+	    G = (int)(R * 0.7);
+	    B = (int)(R * 0.7);
+	}
     }
     
     // Accessors and Mutators
@@ -54,8 +59,9 @@ public class Pixel {
     public double getZ() {
 	return Z;
     }
-    public Pixel copy() {
-	return new Pixel(R, G, B);
+    
+    public double setZ(double Z) {
+	return this.Z = Z;
     }
 
     // Methods
@@ -66,6 +72,9 @@ public class Pixel {
     }
     public boolean compareZ(Pixel p) {
 	return Z >= p.getZ();
+    }
+    public Pixel copy() {
+	return new Pixel(R, G, B);
     }
 
     // ToString Utility
